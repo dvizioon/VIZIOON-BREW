@@ -1,0 +1,308 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// Papéis gravados como texto: ADMIN | ESTAGIARIO
+// SQLite não tem enum nativo. Trocar o provider para postgresql
+// permite converter estes campos em enum sem mudar o restante do código.
+
+model User {
+  id                 String    @id @default(cuid())
+  name               String
+  email              String    @unique
+  passwordHash       String
+  role               String    @default("ESTAGIARIO")
+  mustChangePassword Boolean   @default(false)
+  lastAccessAt       DateTime?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+
+  lessonProgress LessonProgress[]
+  attempts       Attempt[]
+  assignments    StudyPlanAssignment[]
+  activityLogs   ActivityLog[]
+  plansCreated   StudyPlan[]           @relation("PlanAuthor")
+  tracksCreated  Track[]               @relation("TrackAuthor")
+  practices      PracticeSubmission[]
+  activityDeliveries ActivityDelivery[]
+  labSubmissions LabSubmission[]
+}
+
+model Track {
+  id          String   @id @default(cuid())
+  title       String
+  description String
+  published   Boolean  @default(false)
+  createdById String?
+  createdBy   User?    @relation("TrackAuthor", fields: [createdById], references: [id], onDelete: SetNull)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  modules     Module[]
+}
+
+model Module {
+  id          String   @id @default(cuid())
+  trackId     String
+  track       Track    @relation(fields: [trackId], references: [id], onDelete: Cascade)
+  title       String
+  description String   @default("")
+  order       Int
+  lessons     Lesson[]
+  activities  Activity[]
+
+  @@index([trackId, order])
+}
+
+model Activity {
+  id          String   @id @default(cuid())
+  moduleId    String
+  module      Module   @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  title       String
+  description String   @default("")
+  order       Int
+  questions   ActivityQuestion[]
+  deliveries  ActivityDelivery[]
+
+  @@index([moduleId, order])
+}
+
+model ActivityQuestion {
+  id          String   @id @default(cuid())
+  activityId  String
+  activity    Activity @relation(fields: [activityId], references: [id], onDelete: Cascade)
+  prompt      String
+  explanation String   @default("")
+  order       Int
+  language    String
+  starterCode String   @default("")
+  cases       ActivityCase[]
+  answers     ActivityAnswer[]
+
+  @@index([activityId, order])
+}
+
+model ActivityCase {
+  id             String           @id @default(cuid())
+  questionId     String
+  question       ActivityQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  stdin          String           @default("")
+  expectedStdout String           @default("")
+  order          Int
+}
+
+model ActivityDelivery {
+  id         String           @id @default(cuid())
+  userId     String
+  user       User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  activityId String
+  activity   Activity         @relation(fields: [activityId], references: [id], onDelete: Cascade)
+  passed     Boolean
+  createdAt  DateTime         @default(now())
+  answers    ActivityAnswer[]
+
+  @@index([userId, activityId])
+}
+
+model ActivityAnswer {
+  id         String           @id @default(cuid())
+  deliveryId String
+  delivery   ActivityDelivery @relation(fields: [deliveryId], references: [id], onDelete: Cascade)
+  questionId String
+  question   ActivityQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  sourceCode String           @default("")
+  passed     Boolean
+}
+
+model Challenge {
+  id         String         @id @default(cuid())
+  title      String
+  prompt     String
+  published  Boolean        @default(false)
+  order      Int
+  createdAt  DateTime       @default(now())
+  updatedAt  DateTime       @updatedAt
+  submissions LabSubmission[]
+}
+
+model LabSubmission {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  challengeId String
+  challenge   Challenge @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+  filePath    String
+  fileName    String
+  score       Int?
+  comment     String    @default("")
+  reviewedAt  DateTime?
+  createdAt   DateTime  @default(now())
+
+  @@index([challengeId, createdAt])
+  @@index([userId, challengeId])
+}
+
+model Lesson {
+  id              String   @id @default(cuid())
+  moduleId        String
+  module          Module   @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  title           String
+  description     String   @default("")
+  order           Int
+  durationMinutes Int      @default(15)
+  type            String
+  consultaAtiva   Boolean  @default(false)
+  videoUrl        String?
+  videoPath       String?
+  embedUrl        String?
+  embedMode       String   @default("local")
+  materials       Material[]
+  questions       Question[]
+  progress        LessonProgress[]
+  planItems       StudyPlanItem[]
+  attempts        Attempt[]
+
+  @@index([moduleId, order])
+}
+
+model Material {
+  id        String   @id @default(cuid())
+  lessonId  String
+  lesson    Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  title     String
+  fileName  String
+  filePath  String
+  mimeType  String
+  sizeBytes Int
+  createdAt DateTime @default(now())
+}
+
+model Question {
+  id          String   @id @default(cuid())
+  lessonId    String
+  lesson      Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  type        String
+  prompt      String
+  explanation String   @default("")
+  order       Int
+  repoUrl     String?
+  options     Option[]
+  answers     AttemptAnswer[]
+  practices   PracticeSubmission[]
+
+  @@index([lessonId, order])
+}
+
+model PracticeSubmission {
+  id         String    @id @default(cuid())
+  userId     String
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  questionId String
+  question   Question  @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  link       String    @default("")
+  filePath   String?
+  fileName   String    @default("")
+  score      Float?
+  comment    String    @default("")
+  reviewedAt DateTime?
+  createdAt  DateTime  @default(now())
+
+  @@index([questionId, createdAt])
+  @@index([userId, questionId])
+}
+
+model Option {
+  id         String   @id @default(cuid())
+  questionId String
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  text       String
+  isCorrect  Boolean  @default(false)
+  order      Int
+}
+
+model Attempt {
+  id        String          @id @default(cuid())
+  userId    String
+  user      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lessonId  String
+  lesson    Lesson          @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  score     Float
+  createdAt DateTime        @default(now())
+  answers   AttemptAnswer[]
+
+  @@index([userId, createdAt])
+  @@index([lessonId])
+}
+
+model AttemptAnswer {
+  id         String   @id @default(cuid())
+  attemptId  String
+  attempt    Attempt  @relation(fields: [attemptId], references: [id], onDelete: Cascade)
+  questionId String
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  optionId   String?
+  isCorrect  Boolean
+}
+
+model LessonProgress {
+  id           String    @id @default(cuid())
+  userId       String
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  lessonId     String
+  lesson       Lesson    @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  completed    Boolean   @default(false)
+  completedAt  DateTime?
+  studyMinutes Int       @default(0)
+
+  @@unique([userId, lessonId])
+}
+
+model StudyPlan {
+  id          String                @id @default(cuid())
+  title       String
+  weekLabel   String
+  goal        String
+  forAll      Boolean               @default(false)
+  createdById String
+  createdBy   User                  @relation("PlanAuthor", fields: [createdById], references: [id], onDelete: Restrict)
+  createdAt   DateTime              @default(now())
+  items       StudyPlanItem[]
+  assignments StudyPlanAssignment[]
+}
+
+model StudyPlanItem {
+  id       String    @id @default(cuid())
+  planId   String
+  plan     StudyPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
+  lessonId String
+  lesson   Lesson    @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  dueDate  DateTime
+  order    Int
+
+  @@index([planId, dueDate])
+}
+
+model StudyPlanAssignment {
+  id     String    @id @default(cuid())
+  planId String
+  plan   StudyPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
+  userId String
+  user   User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([planId, userId])
+}
+
+model ActivityLog {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  action    String
+  metadata  String   @default("{}")
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
+}
