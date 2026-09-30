@@ -3,13 +3,11 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
-// Papéis gravados como texto: ADMIN | ESTAGIARIO
-// SQLite não tem enum nativo. Trocar o provider para postgresql
-// permite converter estes campos em enum sem mudar o restante do código.
+// A URL do Prisma é montada na subida a partir de DB_HOST, DB_PORT, DB_NAME, DB_USER e DB_PASS.
 
 model User {
   id                 String    @id @default(cuid())

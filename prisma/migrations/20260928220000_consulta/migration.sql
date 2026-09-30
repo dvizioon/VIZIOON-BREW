@@ -1,1 +1,0 @@
-ALTER TABLE "Lesson" ADD COLUMN "consultaAtiva" BOOLEAN NOT NULL DEFAULT false;

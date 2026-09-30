@@ -1,7 +1,7 @@
 services:
   app:
     build:
-      context: .
+      context: ../..
       dockerfile: docker/Dockerfile
       args:
         APP_PORT: ${PORT:-3630}
@@ -9,7 +9,7 @@ services:
     container_name: vizioon-brew
     restart: unless-stopped
     env_file:
-      - .env
+      - ../.env
     environment:
       PORT: ${PORT:-3630}
       HOSTNAME: ${HOSTNAME:-0.0.0.0}

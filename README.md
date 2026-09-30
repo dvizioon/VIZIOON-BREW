@@ -18,7 +18,7 @@
   <img src="https://img.shields.io/badge/TypeScript-5.9-3178C6?style=for-the-badge&logo=typescript&logoColor=white" />
   <br />
   <img src="https://img.shields.io/badge/Prisma-6-2D3748?style=for-the-badge&logo=prisma&logoColor=white" />
-  <img src="https://img.shields.io/badge/SQLite-dev-003B57?style=for-the-badge&logo=sqlite&logoColor=white" />
+  <img src="https://img.shields.io/badge/PostgreSQL-16-4169E1?style=for-the-badge&logo=postgresql&logoColor=white" />
   <img src="https://img.shields.io/badge/VERSION-1.0.0-success?style=for-the-badge" />
   <img src="https://img.shields.io/badge/IDIOMA-pt--BR-F0A36A?style=for-the-badge" />
 </p>
@@ -109,13 +109,13 @@ A raiz `/` manda cada sessão para o lugar certo: sem login vai para `/login`, s
 
 - Next.js 15, App Router, TypeScript, React 19
 - Tailwind CSS 4, Radix Tooltip, Lucide, animate.css
-- Prisma 6 com SQLite. Para PostgreSQL, troque o `provider` em `prisma/schema.prisma` e a `DATABASE_URL`.
+- Prisma 6 com PostgreSQL. A conexão vem de `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER` e `DB_PASS`.
 - Auth.js (login por e-mail e senha, bcrypt)
 - Zod nas mutações
 - Recharts nos gráficos
 - Interface em português do Brasil
 
-Os papéis são texto (`ADMIN` e `ESTAGIARIO`) porque o SQLite não tem enum nativo.
+Os papéis são texto (`ADMIN` e `ESTAGIARIO`).
 
 ---
 
@@ -144,9 +144,13 @@ VIZIOON-BREW/
 │       ├── runtimes/          Java 15.0.2 e Python 3.12.0 da atividade
 │       └── piston/            clone de referência. A aplicação não sobe esse serviço
 ├── VIZIOON-BREW/              cofre Obsidian (esta documentação)
-├── Dockerfile
-├── docker-compose.yml
-└── docker-entrypoint.sh
+├── docker/
+│   ├── Dockerfile             imagem, ARG APP_PORT
+│   ├── docker-entrypoint.sh
+│   ├── README.md
+│   ├── production/            compose e deploy de produção
+│   └── development/           compose e deploy de homologação
+└── docker-compose.yml
 ```
 
 | URL | Quem |
@@ -184,7 +188,7 @@ Abra `http://localhost:3000`.
 
 | Variável | Função |
 | --- | --- |
-| `DATABASE_URL` | SQLite. O padrão é `file:./dev.db`, relativo à pasta `prisma`. |
+| `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASS` | Conexão PostgreSQL. O Prisma monta a URL a partir desses valores. |
 | `AUTH_SECRET` | Assina a sessão. |
 | `AUTH_URL` | Endereço da aplicação. Em desenvolvimento, `http://localhost:3000`. |
 | `AUTH_TRUST_HOST` | Aceita o host do pedido. |
@@ -205,11 +209,16 @@ A atividade precisa de `bwrap`, `prlimit` e `timeout` na máquina. Sem o isolame
 
 ### Docker
 
+O desenho é o mesmo do Nexus: Dockerfile em `docker/Dockerfile`, com `APP_PORT` e `APP_ENV`, e o Compose em `docker/production` e `docker/development`.
+
 ```bash
-docker compose up --build
+cd docker
+bash production/deploy.sh
 ```
 
-A imagem sobe só esta aplicação, na porta 3000. O `.dockerignore` deixa o clone `src/modules/piston` e o cofre de fora. O build monta Java e Python. O banco fica no volume `brew-data`. Os arquivos enviados ficam em `/app/storage`. O serviço usa `privileged` para o `bwrap` isolar o código.
+A porta publicada é a variável `PORT` (padrão 3630). O script monta `docker/.env` a partir do `.env` da aplicação. O banco é o PostgreSQL de `DB_HOST`. Os arquivos enviados ficam no volume `brew_storage`, em `/app/storage`. O `.dockerignore` deixa o clone `src/modules/piston` de fora. O build monta Java e Python. O serviço usa `privileged` para o `bwrap` isolar o código.
+
+No Coolify o pacote é **Dockerfile**, o caminho é `docker/Dockerfile`, e o build arg `APP_PORT` é a mesma porta do campo Port. As variáveis ficam no painel do container. O `.env` não sobe.
 
 O primeiro banco está vazio. O seed apaga o que já existe, então rode só quando quiser as contas de exemplo:
 
