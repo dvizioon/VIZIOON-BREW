@@ -23,3 +23,5 @@ src/modules/runtimes/**/man
 src/modules/runtimes/**/release
 src/modules/runtimes/**/*.tar.gz    
 /VIZIOON-BREW/
+uploads/**
+storage/**
