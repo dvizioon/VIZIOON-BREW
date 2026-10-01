@@ -10,7 +10,7 @@ export default function LoginPage() {
       <div aria-hidden className="pointer-events-none fixed inset-0 overflow-hidden">
         <div
           className="absolute -inset-10 bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: "url(/assets/fundo.png)", filter: "blur(22px)" }}
+          style={{ backgroundImage: "url(/assets/fundo.jpg)", filter: "blur(22px)" }}
         />
       </div>
       <div aria-hidden className="pointer-events-none fixed inset-0" style={{ backgroundColor: "rgba(42, 22, 12, 0.4)" }} />

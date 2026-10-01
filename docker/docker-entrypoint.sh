@@ -22,4 +22,5 @@ until pg_isready -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER"; do
 done
 
 prisma migrate deploy --schema=/app/prisma/schema.prisma
+node /app/scripts/seed-master.mjs
 exec node /app/server.js

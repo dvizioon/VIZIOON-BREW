@@ -316,7 +316,7 @@ export function Shell({ user, children }: { user: SessionUser; children: React.R
           <div
             aria-hidden
             className="pointer-events-none absolute inset-0 bg-cover bg-center bg-no-repeat"
-            style={{ backgroundImage: "url(/assets/fundo.png)" }}
+            style={{ backgroundImage: "url(/assets/fundo.jpg)" }}
           />
           <div aria-hidden className="pointer-events-none absolute inset-0" style={{ backgroundColor: "rgba(122, 58, 18, 0.45)" }} />
           <aside
