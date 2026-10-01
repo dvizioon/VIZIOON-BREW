@@ -7,7 +7,7 @@ COPY package.json package-lock.json ./
 COPY prisma ./prisma
 COPY scripts/with-database-url.mjs ./scripts/with-database-url.mjs
 ENV DATABASE_URL=postgresql://postgres:postgres@localhost:5432/vizioon-brew
-RUN npm ci
+RUN npm ci --include=dev
 COPY . .
 RUN npm run runtime:java && npm run runtime:python
 RUN npx prisma generate && NODE_ENV=production npm run build
