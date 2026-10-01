@@ -10,7 +10,7 @@ ENV DATABASE_URL=postgresql://postgres:postgres@localhost:5432/vizioon-brew
 RUN npm ci
 COPY . .
 RUN npm run runtime:java && npm run runtime:python
-RUN npx prisma generate && npm run build
+RUN npx prisma generate && NODE_ENV=production npm run build
 
 FROM node:22-bookworm-slim
 
