@@ -1,5 +1,7 @@
 import { PrismaClient } from "@prisma/client";
-import { hash } from "bcryptjs";
+import bcrypt from "bcryptjs";
+
+const { hash } = bcrypt;
 
 const email = process.env.SEED_MASTER_EMAIL?.trim();
 const password = process.env.SEED_MASTER_PASSWORD ?? "";

@@ -18,7 +18,6 @@ export default function LoginPage() {
         <div className="flex flex-col items-center text-center">
           <BrandMark className="size-20" />
           <h1 className="mt-4 font-display text-4xl">Vizioon Brew</h1>
-          <p className="mt-2 text-base text-[#f6efe6]/80">Entre com o e-mail e a senha que o tech lead passou.</p>
         </div>
         <div className="mt-8 [&_input]:h-12 [&_input]:border-white/15 [&_input]:bg-black/25 [&_input]:text-base [&_input]:text-[#f6efe6] [&_label]:text-base">
           <LoginForm />
