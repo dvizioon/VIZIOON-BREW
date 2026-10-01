@@ -21,6 +21,6 @@ until pg_isready -h "$DB_HOST" -p "$DB_PORT" -U "$DB_USER"; do
   sleep 2
 done
 
-prisma migrate deploy --schema=/app/prisma/schema.prisma
+node /opt/prisma-cli/node_modules/prisma/build/index.js migrate deploy --schema=/app/prisma/schema.prisma
 node /app/scripts/seed-master.mjs
 exec node /app/server.js

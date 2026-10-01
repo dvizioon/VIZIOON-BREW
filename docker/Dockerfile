@@ -7,10 +7,17 @@ COPY package.json package-lock.json ./
 COPY prisma ./prisma
 COPY scripts/with-database-url.mjs ./scripts/with-database-url.mjs
 ENV DATABASE_URL=postgresql://postgres:postgres@localhost:5432/vizioon-brew
-RUN npm ci --include=dev
+RUN set -eu; ok=0; \
+  for i in 1 2 3; do \
+    if npm ci --include=dev; then ok=1; break; fi; \
+    echo "npm ci falhou, nova tentativa $i"; \
+    sleep 8; \
+  done; \
+  test "$ok" = 1
 COPY . .
 RUN npm run runtime:java && npm run runtime:python
 RUN npx prisma generate && NODE_ENV=production npm run build
+RUN node -e "const fs=require('fs');const path=require('path');const destRoot='/opt/prisma-cli/node_modules';const seen=new Set();function copyPkg(name){if(seen.has(name))return;const src=path.join('/app/node_modules',name);if(!fs.existsSync(path.join(src,'package.json')))return;seen.add(name);const dest=path.join(destRoot,name);fs.mkdirSync(path.dirname(dest),{recursive:true});fs.cpSync(src,dest,{recursive:true,dereference:true});const pkg=JSON.parse(fs.readFileSync(path.join(src,'package.json'),'utf8'));for(const dep of Object.keys({...pkg.dependencies,...pkg.optionalDependencies}))copyPkg(dep);}copyPkg('prisma');"
 
 FROM node:22-bookworm-slim
 
@@ -23,7 +30,6 @@ ENV HOSTNAME=0.0.0.0
 
 RUN apt-get update \
   && apt-get install -y --no-install-recommends bubblewrap util-linux coreutils python3 postgresql-client ca-certificates \
-  && npm install -g prisma@6.16.2 \
   && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 COPY --from=build /app/.next/standalone ./
@@ -32,6 +38,7 @@ COPY --from=build /app/public ./public
 COPY --from=build /app/prisma ./prisma
 COPY --from=build /app/scripts/seed-master.mjs ./scripts/seed-master.mjs
 COPY --from=build /app/node_modules/bcryptjs ./node_modules/bcryptjs
+COPY --from=build /opt/prisma-cli/node_modules /opt/prisma-cli/node_modules
 COPY --from=build /app/src/modules/runtimes ./src/modules/runtimes
 COPY docker/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
