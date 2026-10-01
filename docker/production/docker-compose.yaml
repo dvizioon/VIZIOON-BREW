@@ -26,6 +26,9 @@ services:
       AUTH_SECRET: ${AUTH_SECRET}
       AUTH_URL: ${AUTH_URL}
       AUTH_TRUST_HOST: ${AUTH_TRUST_HOST:-true}
+      SEED_MASTER_EMAIL: ${SEED_MASTER_EMAIL:-}
+      SEED_MASTER_PASSWORD: ${SEED_MASTER_PASSWORD:-}
+      SEED_MASTER_NAME: ${SEED_MASTER_NAME:-Admin}
       LOCAL_STORAGE_PATH: /app/storage
     ports:
       - "${PORT:-3630}:${PORT:-3630}"
