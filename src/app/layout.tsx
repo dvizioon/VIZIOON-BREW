@@ -9,6 +9,8 @@ const sourceSans = Source_Sans_3({
   variable: "--font-source",
 });
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: {
     default: "Vizioon Brew",
