@@ -180,7 +180,7 @@ Gere um valor longo para `AUTH_SECRET` e salve no `.env`.
 ```bash
 npm install
 npx prisma migrate dev
-npm run db:seed
+npm run db:seed:demo
 npm run dev
 ```
 
@@ -200,7 +200,8 @@ Abra `http://localhost:3000`.
 | `npm run build` / `npm run start` | Gera e serve a versão de produção. |
 | `npm run lint` | ESLint. |
 | `npm run db:migrate` | Cria e aplica migrações. |
-| `npm run db:seed` | Recria usuários, conteúdo e progresso de exemplo. Apaga o que já existe. |
+| `npm run db:seed` | Cria o usuário inicial se o e-mail ainda não existe. Não apaga o banco. |
+| `npm run db:seed:demo` | Recria usuários, conteúdo e progresso de exemplo. Apaga o que já existe. |
 | `npm run db:reset` | Apaga o banco, reaplica as migrações e roda o seed. |
 | `npm run runtime:java` | Monta o OpenJDK 15.0.2 em `src/modules/runtimes`, se `bin/java` ainda não existe. |
 | `npm run runtime:python` | Monta o Python 3.12.0, se o binário ainda não existe. |

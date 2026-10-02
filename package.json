@@ -9,13 +9,14 @@
     "lint": "next lint",
     "postinstall": "node scripts/with-database-url.mjs ./node_modules/.bin/prisma generate",
     "db:migrate": "node scripts/with-database-url.mjs ./node_modules/.bin/prisma migrate dev",
-    "db:seed": "node scripts/with-database-url.mjs node --import tsx prisma/seed.ts",
+    "db:seed": "node scripts/with-database-url.mjs node prisma/seed.mjs",
+    "db:seed:demo": "node scripts/with-database-url.mjs node --import tsx prisma/seed.ts",
     "db:reset": "node scripts/with-database-url.mjs ./node_modules/.bin/prisma migrate reset --force",
     "runtime:java": "bash -c 'cd src/modules/runtimes/java/15.0.2 && test -x bin/java || bash build.sh'",
     "runtime:python": "bash -c 'cd src/modules/runtimes/python/3.12.0 && test -x bin/python3.12 || { curl -fsSL -o pkg.tar.gz https://github.com/engineer-man/piston/releases/download/pkgs/python-3.12.0.pkg.tar.gz && tar xzf pkg.tar.gz && rm pkg.tar.gz; } && chmod +x run'"
   },
   "prisma": {
-    "seed": "node scripts/with-database-url.mjs node --import tsx prisma/seed.ts"
+    "seed": "node scripts/with-database-url.mjs node prisma/seed.mjs"
   },
   "dependencies": {
     "@codemirror/lang-java": "^6.0.2",

@@ -35,8 +35,11 @@ WORKDIR /app
 COPY --from=build /app/.next/standalone ./
 COPY --from=build /app/.next/static ./.next/static
 COPY --from=build /app/public ./public
+COPY --from=build /app/package.json ./package.json
 COPY --from=build /app/prisma ./prisma
-COPY --from=build /app/scripts/seed-master.mjs ./scripts/seed-master.mjs
+COPY --from=build /app/scripts/with-database-url.mjs ./scripts/with-database-url.mjs
+COPY --from=build /app/node_modules/.prisma ./node_modules/.prisma
+COPY --from=build /app/node_modules/@prisma/client ./node_modules/@prisma/client
 COPY --from=build /app/node_modules/bcryptjs ./node_modules/bcryptjs
 COPY --from=build /opt/prisma-cli/node_modules /opt/prisma-cli/node_modules
 COPY --from=build /app/src/modules/runtimes ./src/modules/runtimes
