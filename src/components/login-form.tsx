@@ -10,7 +10,7 @@ export function LoginForm({ error: initialError }: { error?: string }) {
   const [error, setError] = useState(initialError);
   const [pending, setPending] = useState(false);
 
-  async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
+  async function onSubmit(event: React.SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
     setPending(true);
     setError(undefined);
