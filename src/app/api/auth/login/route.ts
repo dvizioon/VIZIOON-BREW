@@ -2,24 +2,21 @@ import { AuthError } from "next-auth";
 import { NextResponse } from "next/server";
 import { signIn } from "@/lib/auth";
 
-function appUrl(path: string) {
-  const base = process.env.AUTH_URL ?? "http://localhost:3630";
-  return new URL(path, base);
-}
-
 export async function POST(request: Request) {
   const formData = await request.formData();
+  const home = new URL("/", request.url);
+  const denied = new URL("/login?erro=1", request.url);
   try {
     await signIn("credentials", {
       email: String(formData.get("email") ?? ""),
       password: String(formData.get("password") ?? ""),
-      redirectTo: "/",
+      redirectTo: home.toString(),
     });
   } catch (error) {
     if (error instanceof AuthError) {
-      return NextResponse.redirect(appUrl("/login?erro=1"), 303);
+      return NextResponse.redirect(denied, 303);
     }
     throw error;
   }
-  return NextResponse.redirect(appUrl("/"), 303);
+  return NextResponse.redirect(home, 303);
 }
