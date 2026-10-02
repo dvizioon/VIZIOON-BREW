@@ -29,13 +29,17 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           where: { id: user.id },
           data: { lastAccessAt: new Date() },
         });
-        await prisma.activityLog.create({
-          data: {
-            userId: user.id,
-            action: "ACESSO",
-            metadata: "{}",
-          },
-        });
+        try {
+          await prisma.activityLog.create({
+            data: {
+              userId: user.id,
+              action: "ACESSO",
+              metadata: "{}",
+            },
+          });
+        } catch {
+          // login não depende do log
+        }
 
         return {
           id: user.id,

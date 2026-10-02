@@ -2,11 +2,9 @@
 
 import { useState } from "react";
 import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
 import { Button, Field, Input } from "@/components/ui";
 
 export function LoginForm({ error: initialError }: { error?: string }) {
-  const router = useRouter();
   const [error, setError] = useState(initialError);
   const [pending, setPending] = useState(false);
 
@@ -16,21 +14,27 @@ export function LoginForm({ error: initialError }: { error?: string }) {
     setError(undefined);
 
     const form = new FormData(event.currentTarget);
-    const result = await signIn("credentials", {
-      email: String(form.get("email") ?? ""),
-      password: String(form.get("password") ?? ""),
-      redirect: false,
-      callbackUrl: "/",
-    });
+    const callbackUrl = `${window.location.origin}/`;
 
-    if (result?.error) {
+    try {
+      const result = await signIn("credentials", {
+        email: String(form.get("email") ?? ""),
+        password: String(form.get("password") ?? ""),
+        redirect: false,
+        callbackUrl,
+      });
+
+      if (result?.error) {
+        setPending(false);
+        setError("E-mail ou senha inválidos.");
+        return;
+      }
+
+      window.location.assign(result?.url || callbackUrl);
+    } catch {
       setPending(false);
-      setError("E-mail ou senha inválidos.");
-      return;
+      setError("Não foi possível entrar. Tente de novo.");
     }
-
-    router.replace(result?.url || "/");
-    router.refresh();
   }
 
   return (
