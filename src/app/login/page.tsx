@@ -4,9 +4,7 @@ import { BrandMark } from "@/layout/brand";
 
 export const metadata: Metadata = { title: "Entrar" };
 
-export default async function LoginPage({ searchParams }: { searchParams: Promise<{ erro?: string }> }) {
-  const params = await searchParams;
-  const error = params.erro ? "E-mail ou senha inválidos." : undefined;
+export default function LoginPage() {
   return (
     <div className="relative flex min-h-dvh items-center justify-center overflow-hidden px-4 py-8 sm:px-6">
       <div aria-hidden className="pointer-events-none fixed inset-0 overflow-hidden">
@@ -22,7 +20,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
           <h1 className="mt-4 font-display text-4xl">Vizioon Brew</h1>
         </div>
         <div className="mt-8 [&_input]:h-12 [&_input]:border-white/15 [&_input]:bg-black/25 [&_input]:text-base [&_input]:text-[#f6efe6] [&_label]:text-base">
-          <LoginForm error={error} />
+          <LoginForm />
         </div>
       </section>
     </div>
