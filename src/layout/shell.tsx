@@ -88,7 +88,7 @@ const adminNav = [
   { href: "/admin", label: "Painel", icon: LayoutDashboard, hint: "Visão da turma, do conteúdo e de quem está parado há 7 dias." },
   { href: "/admin/estagiarios", label: "Estagiários", icon: Users, hint: "Não há cadastro público. Quem entra aqui recebe uma senha inicial e precisa trocá-la no primeiro acesso." },
   { href: "/admin/conteudo", label: "Conteúdo", icon: BookOpen, hint: "Crie o blend aqui. Módulos e doses ficam na página dele, uma aba por vez." },
-  { href: "/lab", label: "Lab", icon: FlaskConical, hint: "Você escreve as especificações. O estagiário envia um zip com o código. A nota e o comentário ficam no desafio." },
+  { href: "/lab", label: "Lab", icon: FlaskConical, hint: "Escreva as especificações em Markdown e veja a prévia como o estagiário lê. A nota e o comentário ficam no desafio." },
   { href: "/admin/planos", label: "Receitas", icon: CalendarDays, hint: "A receita da semana reúne doses e prazos. Atribua a uma pessoa ou a todos, inclusive quem for criado depois." },
   { href: "/admin/relatorios", label: "Relatórios", icon: BarChart3, hint: "O blend e o módulo filtram as doses. O período filtra conclusões, notas e taxas de erro." },
 ];

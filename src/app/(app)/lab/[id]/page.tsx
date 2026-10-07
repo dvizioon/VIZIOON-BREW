@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { ChevronLeft } from "lucide-react";
 import { submitLabZip, updateChallenge } from "@/actions/lab";
 import { ActionForm, SubmitButton } from "@/components/form";
+import { LabPreview } from "@/components/lab-preview";
 import { LabReview } from "@/components/lab-review";
 import { Markdown } from "@/components/markdown";
 import { Badge, Card, Field, Input, PageHeader, Table, Td, Textarea, Th, Toggle } from "@/components/ui";
@@ -37,25 +38,32 @@ export default async function ChallengePage({ params }: { params: Promise<{ id: 
         </Link>
         <PageHeader
           title={challenge.title}
-          description="As especificações estão abaixo. O estagiário envia um zip com o código."
+          description={
+            user.role === "ADMIN"
+              ? "Edite as especificações e veja ao lado como o estagiário lê o desafio."
+              : "As especificações estão abaixo. O estagiário envia um zip com o código."
+          }
           action={<Badge tone={challenge.published ? "good" : "warn"}>{challenge.published ? "Lançado" : "Rascunho"}</Badge>}
         />
       </div>
       {user.role === "ADMIN" ? (
-        <Card className="p-5">
-          <h2 className="font-display text-xl">Especificações</h2>
-          <ActionForm action={updateChallenge} className="mt-5 grid gap-5">
-            <input type="hidden" name="id" value={challenge.id} />
-            <Field label="Título">
-              <Input name="title" defaultValue={challenge.title} required />
-            </Field>
-            <Field label="Especificações" hint="Markdown. É o que o estagiário lê antes de enviar o zip.">
-              <Textarea name="prompt" defaultValue={challenge.prompt} required />
-            </Field>
-            <Toggle name="published" label="Lançado para os estagiários" defaultChecked={challenge.published} />
-            <SubmitButton>Salvar desafio</SubmitButton>
-          </ActionForm>
-        </Card>
+        <div className="grid items-start gap-4 xl:grid-cols-2">
+          <Card className="p-5">
+            <h2 className="font-display text-xl">Especificações</h2>
+            <ActionForm id="challenge-form" action={updateChallenge} className="mt-5 grid gap-5">
+              <input type="hidden" name="id" value={challenge.id} />
+              <Field label="Título">
+                <Input name="title" defaultValue={challenge.title} required />
+              </Field>
+              <Field label="Especificações" hint="Markdown. É o que o estagiário lê antes de enviar o zip.">
+                <Textarea name="prompt" defaultValue={challenge.prompt} required className="min-h-80 font-mono text-sm" />
+              </Field>
+              <Toggle name="published" label="Lançado para os estagiários" defaultChecked={challenge.published} />
+              <SubmitButton>Salvar desafio</SubmitButton>
+            </ActionForm>
+          </Card>
+          <LabPreview formId="challenge-form" />
+        </div>
       ) : (
         <Card className="p-5">
           <h2 className="font-display text-xl">Especificações</h2>
