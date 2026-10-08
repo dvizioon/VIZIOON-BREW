@@ -15,7 +15,6 @@ RUN set -eu; ok=0; \
   done; \
   test "$ok" = 1
 COPY . .
-RUN npm run runtime:java && npm run runtime:python
 RUN npx prisma generate && NODE_ENV=production npm run build
 RUN node -e "const fs=require('fs');const path=require('path');const destRoot='/opt/prisma-cli/node_modules';const seen=new Set();function copyPkg(name){if(seen.has(name))return;const src=path.join('/app/node_modules',name);if(!fs.existsSync(path.join(src,'package.json')))return;seen.add(name);const dest=path.join(destRoot,name);fs.mkdirSync(path.dirname(dest),{recursive:true});fs.cpSync(src,dest,{recursive:true,dereference:true});const pkg=JSON.parse(fs.readFileSync(path.join(src,'package.json'),'utf8'));for(const dep of Object.keys({...pkg.dependencies,...pkg.optionalDependencies}))copyPkg(dep);}copyPkg('prisma');"
 
@@ -29,7 +28,7 @@ ENV NODE_ENV=production
 ENV HOSTNAME=0.0.0.0
 
 RUN apt-get update \
-  && apt-get install -y --no-install-recommends bubblewrap util-linux coreutils python3 postgresql-client ca-certificates \
+  && apt-get install -y --no-install-recommends curl ca-certificates tar gzip bubblewrap util-linux coreutils python3 postgresql-client \
   && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 COPY --from=build /app/.next/standalone ./
@@ -44,6 +43,8 @@ COPY --from=build /app/node_modules/bcryptjs ./node_modules/bcryptjs
 COPY --from=build /opt/prisma-cli/node_modules /opt/prisma-cli/node_modules
 COPY --from=build /app/src/modules/runtimes ./src/modules/runtimes
 COPY docker/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
-RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh \
+  && npm run runtime:java \
+  && npm run runtime:python
 EXPOSE ${APP_PORT}
 ENTRYPOINT ["docker-entrypoint.sh"]
