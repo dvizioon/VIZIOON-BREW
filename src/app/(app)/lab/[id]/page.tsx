@@ -47,8 +47,8 @@ export default async function ChallengePage({ params }: { params: Promise<{ id: 
         />
       </div>
       {user.role === "ADMIN" ? (
-        <div className="grid items-start gap-4 xl:grid-cols-2">
-          <Card className="p-5">
+        <div className="grid min-w-0 items-start gap-4 xl:grid-cols-2">
+          <Card className="min-w-0 p-5">
             <h2 className="font-display text-xl">Especificações</h2>
             <ActionForm id="challenge-form" action={updateChallenge} className="mt-5 grid gap-5">
               <input type="hidden" name="id" value={challenge.id} />
